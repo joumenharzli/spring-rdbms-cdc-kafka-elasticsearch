@@ -1,0 +1,13 @@
+[mysqld]
+
+# Enable the binlog for replication & CDC
+server-id         = 223344
+log_bin           = mysql-bin
+binlog_format     = row
+binlog_row_image  = full
+expire_logs_days  = 10
+
+# Enable GTIDs on this master
+gtid_mode                 = on
+enforce_gtid_consistency  = on
+
