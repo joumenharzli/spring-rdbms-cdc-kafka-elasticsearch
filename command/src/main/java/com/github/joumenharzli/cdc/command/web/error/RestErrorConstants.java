@@ -13,19 +13,21 @@
  *
  */
 
-package com.github.joumenharzli.cdc.command;
+package com.github.joumenharzli.cdc.command.web.error;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-@SpringBootApplication
-@EnableJpaRepositories
-@EnableTransactionManagement
-public class CommandApplication {
+/**
+ * Constants for rest error
+ *
+ * @author Joumen Harzli
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RestErrorConstants {
 
-  public static void main(String[] args) {
-    SpringApplication.run(CommandApplication.class, args);
-  }
+  public static final String ERR_INTERNAL_SERVER_ERROR = "error.internal";
+  public static final String ERR_VALIDATION_ERROR = "error.validation";
+  public static final String ERR_NOT_FOUND_ERROR = "error.notFound";
+
 }

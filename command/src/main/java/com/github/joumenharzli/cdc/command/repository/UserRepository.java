@@ -13,19 +13,20 @@
  *
  */
 
-package com.github.joumenharzli.cdc.command;
+package com.github.joumenharzli.cdc.command.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import java.util.UUID;
 
-@SpringBootApplication
-@EnableJpaRepositories
-@EnableTransactionManagement
-public class CommandApplication {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-  public static void main(String[] args) {
-    SpringApplication.run(CommandApplication.class, args);
-  }
+import com.github.joumenharzli.cdc.command.domain.User;
+
+/**
+ * JPA Repository for the entity {@link User}
+ *
+ * @author Joumen Harzli
+ */
+@Repository
+public interface UserRepository extends JpaRepository<User, UUID> {
 }

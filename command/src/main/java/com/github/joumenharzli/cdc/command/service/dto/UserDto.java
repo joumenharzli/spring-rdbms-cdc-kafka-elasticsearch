@@ -13,19 +13,25 @@
  *
  */
 
-package com.github.joumenharzli.cdc.command;
+package com.github.joumenharzli.cdc.command.service.dto;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import java.util.List;
+import lombok.Data;
 
-@SpringBootApplication
-@EnableJpaRepositories
-@EnableTransactionManagement
-public class CommandApplication {
+/**
+ * UserDto
+ *
+ * @author Joumen Harzli
+ */
+@Data
+public class UserDto {
 
-  public static void main(String[] args) {
-    SpringApplication.run(CommandApplication.class, args);
-  }
+  private String id;
+
+  private String name;
+
+  List<AddressDto> addresses;
+
+  List<JobDto> jobs;
+
 }

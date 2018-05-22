@@ -13,19 +13,24 @@
  *
  */
 
-package com.github.joumenharzli.cdc.command;
+package com.github.joumenharzli.cdc.command.web.error;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import java.io.Serializable;
+import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@SpringBootApplication
-@EnableJpaRepositories
-@EnableTransactionManagement
-public class CommandApplication {
+/**
+ * A representation for the rest error
+ *
+ * @author Joumen Harzli
+ */
+@ApiModel("RestErrorDto")
+@Data
+@AllArgsConstructor
+public class RestErrorDto implements Serializable {
 
-  public static void main(String[] args) {
-    SpringApplication.run(CommandApplication.class, args);
-  }
+  private String code;
+  private String message;
+
 }

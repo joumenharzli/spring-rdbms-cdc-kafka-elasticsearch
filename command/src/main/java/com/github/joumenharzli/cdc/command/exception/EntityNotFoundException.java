@@ -13,19 +13,19 @@
  *
  */
 
-package com.github.joumenharzli.cdc.command;
+package com.github.joumenharzli.cdc.command.exception;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+/**
+ * Exception thrown when no entity was found
+ *
+ * @author Joumen Harzli
+ */
+public class EntityNotFoundException extends RuntimeException {
 
-@SpringBootApplication
-@EnableJpaRepositories
-@EnableTransactionManagement
-public class CommandApplication {
+  private final String message;
 
-  public static void main(String[] args) {
-    SpringApplication.run(CommandApplication.class, args);
+  public EntityNotFoundException(String message) {
+    super(message);
+    this.message = message;
   }
 }
