@@ -42,6 +42,6 @@ public class Address implements Serializable {
   @Column(name = "NAME")
   private String name;
 
-  @Column(name = "USER_ID")
+  @Column(name = "USER_ID", columnDefinition = "BINARY(16)", length = 16)
   private UUID userId;
 }

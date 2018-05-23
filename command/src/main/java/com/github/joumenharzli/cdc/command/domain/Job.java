@@ -52,6 +52,6 @@ public class Job implements Serializable {
   @Column(name = "END_DATE")
   private Instant endDate;
 
-  @Column(name = "USER_ID")
+  @Column(name = "USER_ID", columnDefinition = "BINARY(16)", length = 16)
   private UUID userId;
 }
