@@ -22,6 +22,7 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Address Entity
@@ -29,8 +30,9 @@ import lombok.Data;
  * @author Joumen Harzli
  */
 @Entity
-@Data
 @Table(name = "ADDRESSES")
+@Data
+@EqualsAndHashCode(of = {"id"})
 public class Address implements Serializable {
 
   @Id

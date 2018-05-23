@@ -23,6 +23,7 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Job Entity
@@ -30,8 +31,9 @@ import lombok.Data;
  * @author Joumen Harzli
  */
 @Entity
-@Data
 @Table(name = "JOBS")
+@Data
+@EqualsAndHashCode(of = {"id"})
 public class Job implements Serializable {
 
   @Id

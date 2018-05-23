@@ -25,15 +25,17 @@ import org.hibernate.annotations.GenericGenerator;
 import com.google.common.collect.Lists;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * User Entity
  *
  * @author Joumen Harzli
  */
-@Data
 @Entity
 @Table(name = "USERS")
+@Data
+@EqualsAndHashCode(of = {"id"})
 public class User implements Serializable {
 
   @Id
@@ -47,10 +49,10 @@ public class User implements Serializable {
 
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
-  List<Address> addresses = Lists.newArrayList();
+  private List<Address> addresses = Lists.newArrayList();
 
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
-  List<Job> jobs = Lists.newArrayList();
+  private List<Job> jobs = Lists.newArrayList();
 
 }
