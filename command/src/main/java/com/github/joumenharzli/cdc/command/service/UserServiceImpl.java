@@ -30,6 +30,7 @@ import com.github.joumenharzli.cdc.command.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Implementation of {@link UserService}
@@ -59,7 +60,8 @@ public class UserServiceImpl implements UserService {
     Assert.isNull(userDto.getId(), "User should not have an id");
 
     return Mono.fromSupplier(() -> userMapper.toEntity(userDto))
-        .map(userRepository::save)
+        .publishOn(Schedulers.parallel())
+        .doOnNext(userRepository::save)
         .map(userMapper::toDto);
   }
 
@@ -77,13 +79,10 @@ public class UserServiceImpl implements UserService {
     Assert.notNull(userDto, "User cannot be null");
     Assert.hasText(userDto.getId(), "Id of the user cannot be null/empty");
 
-    return Mono.fromSupplier(() -> userMapper.toEntity(userDto))
-        .map(user -> {
-          // assert that the user exists
-          findById(user.getId());
-
-          return userRepository.save(user);
-        })
+    return findById(userDto.getId())
+        .flatMap(u -> Mono.just(userMapper.toEntity(userDto)))
+        .publishOn(Schedulers.parallel())
+        .doOnNext(userRepository::save)
         .map(userMapper::toDto);
   }
 
@@ -100,9 +99,9 @@ public class UserServiceImpl implements UserService {
     LOGGER.debug("Request to delete user with id {}", userId);
     Assert.hasText(userId, "Id of the user cannot be null/empty");
 
-    return Mono.fromSupplier(() -> UUID.fromString(userId))
-        .map(this::findById)
-        .map(this::delete)
+    return this.findById(userId)
+        .publishOn(Schedulers.parallel())
+        .doOnNext(userRepository::delete)
         .then();
   }
 
@@ -113,20 +112,11 @@ public class UserServiceImpl implements UserService {
    * @return the found user
    * @throws EntityNotFoundException if no entity was found
    */
-  private User findById(UUID id) {
-    return userRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException(String.format("Entity with id %s was not found", id)));
-  }
-
-  /**
-   * Delete a user
-   *
-   * @param user user to delete
-   * @return an empty Mono
-   */
-  private Mono<Void> delete(User user) {
-    userRepository.delete(user);
-    return Mono.empty();
+  private Mono<User> findById(String id) {
+    return Mono.defer(() -> Mono.just(
+        userRepository.findById(UUID.fromString(id))
+            .orElseThrow(() -> new EntityNotFoundException(String.format("Entity with id %s was not found", id)))))
+        .subscribeOn(Schedulers.elastic());
   }
 
 }
