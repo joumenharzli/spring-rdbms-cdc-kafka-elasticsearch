@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -30,6 +29,8 @@ import com.github.joumenharzli.cdc.query.util.SearchQueryBuilder;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Implementation for {@link UserService}
@@ -52,19 +53,19 @@ public class UserServiceImpl implements UserService {
    * @throws IllegalArgumentException if any given argument is invalid
    */
   @Override
-  public Page<User> findByCriteria(List<QueryParameter> parameters, Pageable pageable) {
+  public Mono<Page<User>> findByCriteria(List<QueryParameter> parameters, Pageable pageable) {
     LOGGER.debug("Request to search for users with parameters {} and {}", parameters, pageable);
 
     Assert.notNull(parameters, "List of parameters cannot be null");
     Assert.notNull(pageable, "Pageable cannot be null");
 
     //@formatter:off
-    SearchQuery searchQuery = SearchQueryBuilder.fromParameters(parameters)
-                                                .withPageable(pageable)
-                                                .build();
+    return Mono.defer(() -> Mono.just(SearchQueryBuilder.fromParameters(parameters)
+                                                        .withPageable(pageable)
+                                                        .build()))
+               .flatMap(searchQuery -> Mono.just(userRepository.search(searchQuery)))
+               .subscribeOn(Schedulers.elastic());
     //@formatter:on
-
-    return userRepository.search(searchQuery);
   }
 
 

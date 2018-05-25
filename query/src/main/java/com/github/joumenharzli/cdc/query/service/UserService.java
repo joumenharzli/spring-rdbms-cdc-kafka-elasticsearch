@@ -23,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import com.github.joumenharzli.cdc.query.domain.User;
 import com.github.joumenharzli.cdc.query.service.dto.QueryParameter;
 
+import reactor.core.publisher.Mono;
+
 /**
  * Search Service for the index {@link User}
  *
@@ -38,6 +40,6 @@ public interface UserService {
    * @return the found users in a page
    * @throws IllegalArgumentException if any given argument is invalid
    */
-  Page<User> findByCriteria(List<QueryParameter> parameters, Pageable pageable);
+  Mono<Page<User>> findByCriteria(List<QueryParameter> parameters, Pageable pageable);
 
 }

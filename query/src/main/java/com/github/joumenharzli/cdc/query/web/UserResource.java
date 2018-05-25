@@ -15,22 +15,22 @@
 
 package com.github.joumenharzli.cdc.query.web;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.codahale.metrics.annotation.Timed;
 import com.github.joumenharzli.cdc.query.domain.User;
 import com.github.joumenharzli.cdc.query.service.UserService;
-import com.github.joumenharzli.cdc.query.service.dto.QueryParameter;
 import com.github.joumenharzli.cdc.query.util.QueryUtils;
 import com.google.common.collect.Lists;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 /**
  * Reactive REST resource for the index {@link User}
@@ -56,21 +56,20 @@ public class UserResource {
    * @return the ResponseEntity with status 200 (OK) and with body containing the page with the found results
    * @throws IllegalArgumentException when any given argument is invalid
    */
-  @GetMapping(value = "/search/{parameters}")
+  @GetMapping(value = {"/search/{parameters}", "/search"})
   @Timed
-  public Page<User> search(@PathVariable(value = "parameters", required = false) String parameters,
-                           @RequestParam(name = "page") int page,
-                           @RequestParam(name = "size") int size) {
+  public Mono<ResponseEntity<Page<User>>> search(@PathVariable Optional<String> parameters,
+                                                 @RequestParam(name = "page") int page,
+                                                 @RequestParam(name = "size") int size) {
 
     LOGGER.debug("REST request to search for users with parameters {} and page {} and size {}", parameters, page, size);
 
     //@formatter:off
-    List<QueryParameter> parameterList = Optional.ofNullable(parameters)
-                                                 .map(QueryUtils::parseURLParameters)
-                                                 .orElseGet(Lists::newArrayList);
+    return Mono.fromSupplier(() -> parameters.map(QueryUtils::parseURLParameters)
+                                             .orElse(Lists.newArrayList()))
+               .flatMap(parameterList -> userService.findByCriteria(parameterList, PageRequest.of(page, size)))
+               .map(ResponseEntity::ok);
     //@formatter:on
-
-    return userService.findByCriteria(parameterList, PageRequest.of(page, size));
   }
 
 }
