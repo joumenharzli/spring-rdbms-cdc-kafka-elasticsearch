@@ -1,0 +1,15 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: user-query
+
+  jackson:
+    serialization.write-dates-as-timestamps: false
+
+  data:
+    elasticsearch:
+      cluster-name: es-cluster
+      cluster-nodes: localhost:9300
+

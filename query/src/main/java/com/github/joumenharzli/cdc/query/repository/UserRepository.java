@@ -13,15 +13,18 @@
  *
  */
 
-package com.github.joumenharzli.cdc.query;
+package com.github.joumenharzli.cdc.query.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.stereotype.Repository;
 
-@SpringBootApplication
-public class QueryApplication {
+import com.github.joumenharzli.cdc.query.domain.User;
 
-	public static void main(String[] args) {
-		SpringApplication.run(QueryApplication.class, args);
-	}
+/**
+ * Elastic search repository for the index {@link User}
+ *
+ * @author Joumen Harzli
+ */
+@Repository
+public interface UserRepository extends ElasticsearchRepository<User, String> {
 }

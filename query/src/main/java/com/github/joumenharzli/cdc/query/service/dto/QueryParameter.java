@@ -13,15 +13,22 @@
  *
  */
 
-package com.github.joumenharzli.cdc.query;
+package com.github.joumenharzli.cdc.query.service.dto;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import lombok.Builder;
+import lombok.Data;
 
-@SpringBootApplication
-public class QueryApplication {
+/**
+ * Parameter of a query
+ *
+ * @author Joumen Harzli
+ */
+@Data
+@Builder
+public class QueryParameter {
 
-	public static void main(String[] args) {
-		SpringApplication.run(QueryApplication.class, args);
-	}
+  private String field;
+  private String value;
+  private QueryOperator operator;
+
 }

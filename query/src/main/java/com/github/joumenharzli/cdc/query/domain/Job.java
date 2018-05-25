@@ -13,15 +13,30 @@
  *
  */
 
-package com.github.joumenharzli.cdc.query;
+package com.github.joumenharzli.cdc.query.domain;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.io.Serializable;
+import java.time.Instant;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@SpringBootApplication
-public class QueryApplication {
+/**
+ * Job Type
+ *
+ * @author Joumen Harzli
+ */
+@Data
+@EqualsAndHashCode(of = {"id"})
+public class Job implements Serializable {
 
-	public static void main(String[] args) {
-		SpringApplication.run(QueryApplication.class, args);
-	}
+  private String id;
+
+  private String name;
+
+  private String description;
+
+  private Instant startDate;
+
+  private Instant endDate;
+
 }
