@@ -4,7 +4,7 @@ services:
     build: mysql
     hostname: mysql
     ports:
-      - "8989:3306"
+      - "3306:3306"
     networks:
       - cdcrx
     environment:
