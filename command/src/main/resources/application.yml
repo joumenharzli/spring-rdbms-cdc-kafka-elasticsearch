@@ -10,7 +10,9 @@ spring:
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://cdc_user:cdc_pass@localhost:3306/cdc
+    url: jdbc:mysql://localhost:3306/cdc
+    username: cdc_user
+    password: cdc_pass
     hikari:
       data-source-properties:
         cachePrepStmts: true
