@@ -10,7 +10,7 @@ curl -X POST -H "Content-Type: application/json" localhost:8083/connectors -d @-
     "database.password": "dbz",
     "database.server.id": "184054",
     "database.server.name": "mysqlcdc",
-    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.bootstrap.servers": "kafka:29092",
     "database.history.kafka.topic": "dbhistory.mysqlcdc",
     "include.schema.changes": "true"
   }
