@@ -13,17 +13,21 @@
  *
  */
 
-package com.github.joumenharzli.cdc.query;
+package com.github.joumenharzli.cdc.query.web.error;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-@SpringBootApplication
-@EnableAspectJAutoProxy
-public class QueryApplication {
+/**
+ * Constants for rest error
+ *
+ * @author Joumen Harzli
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RestErrorConstants {
 
-	public static void main(String[] args) {
-		SpringApplication.run(QueryApplication.class, args);
-	}
+  public static final String ERR_INTERNAL_SERVER_ERROR = "error.internal";
+  public static final String ERR_VALIDATION_ERROR = "error.validation";
+  public static final String ERR_NOT_FOUND_ERROR = "error.notFound";
+
 }

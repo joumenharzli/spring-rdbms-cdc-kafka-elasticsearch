@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8082
 
 spring:
   application:
@@ -13,3 +13,8 @@ spring:
       cluster-name: es-cluster
       cluster-nodes: localhost:9300
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, info, prometheus

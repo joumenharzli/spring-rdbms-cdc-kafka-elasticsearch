@@ -13,17 +13,23 @@
  *
  */
 
-package com.github.joumenharzli.cdc.query;
+package com.github.joumenharzli.cdc.query.web.error;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@SpringBootApplication
-@EnableAspectJAutoProxy
-public class QueryApplication {
+/**
+ * A representation for the rest field error
+ *
+ * @author Joumen Harzli
+ */
+@Data
+@AllArgsConstructor
+public class RestFieldErrorDto implements Serializable {
 
-	public static void main(String[] args) {
-		SpringApplication.run(QueryApplication.class, args);
-	}
+  private String field;
+  private String code;
+  private String message;
+
 }

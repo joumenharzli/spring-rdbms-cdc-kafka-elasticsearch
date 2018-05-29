@@ -22,12 +22,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.codahale.metrics.annotation.Timed;
 import com.github.joumenharzli.cdc.query.domain.User;
 import com.github.joumenharzli.cdc.query.service.UserService;
 import com.github.joumenharzli.cdc.query.util.QueryUtils;
 import com.google.common.collect.Lists;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;

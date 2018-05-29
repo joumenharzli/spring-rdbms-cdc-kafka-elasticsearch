@@ -60,9 +60,9 @@ public class UserServiceImpl implements UserService {
     Assert.notNull(pageable, "Pageable cannot be null");
 
     //@formatter:off
-    return Mono.defer(() -> Mono.just(SearchQueryBuilder.fromParameters(parameters)
+    return Mono.fromSupplier(() -> SearchQueryBuilder.fromParameters(parameters)
                                                         .withPageable(pageable)
-                                                        .build()))
+                                                        .build())
                .flatMap(searchQuery -> Mono.just(userRepository.search(searchQuery)))
                .subscribeOn(Schedulers.elastic());
     //@formatter:on
