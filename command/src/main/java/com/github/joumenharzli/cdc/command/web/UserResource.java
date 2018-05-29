@@ -61,10 +61,11 @@ public class UserResource {
       throw new IllegalArgumentException("A new user cannot already have an ID");
     }
 
+    //@formatter:off
     return userService.create(userDto)
-        .map(createdUser -> ResponseEntity.created(
-            URI.create(String.format("/api/v1/users/%s", createdUser.getId()))
-        ).body(createdUser));
+					  .map(createdUser -> ResponseEntity.created(URI.create(String.format("/api/v1/users/%s", createdUser.getId())))
+														.body(createdUser));
+	//@formatter:on
   }
 
   /**
@@ -84,8 +85,10 @@ public class UserResource {
       throw new IllegalArgumentException("The provided user should have an id");
     }
 
+    //@formatter:off
     return userService.update(userDto)
-        .map(updatedUser -> ResponseEntity.ok().body(updatedUser));
+					  .map(updatedUser -> ResponseEntity.ok().body(updatedUser));
+	//@formatter:on
   }
 
   /**
@@ -105,8 +108,10 @@ public class UserResource {
       throw new IllegalArgumentException("The provided id is invalid");
     }
 
+    //@formatter:off
     return userService.deleteById(userId)
-        .map(v -> ResponseEntity.ok().build());
+					  .map(v -> ResponseEntity.ok().build());
+	//@formatter:on
   }
 
 

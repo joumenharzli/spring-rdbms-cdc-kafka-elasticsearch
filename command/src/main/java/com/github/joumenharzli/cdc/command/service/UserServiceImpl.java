@@ -56,13 +56,16 @@ public class UserServiceImpl implements UserService {
   @Override
   public Mono<UserDto> create(UserDto userDto) {
     LOGGER.debug("Request to create user : {}", userDto);
+
     Assert.notNull(userDto, "User cannot be null");
     Assert.isNull(userDto.getId(), "User should not have an id");
 
+    //@formatter:off
     return Mono.fromSupplier(() -> userMapper.toEntity(userDto))
-        .publishOn(Schedulers.parallel())
-        .doOnNext(userRepository::save)
-        .map(userMapper::toDto);
+			   .publishOn(Schedulers.parallel())
+			   .doOnNext(userRepository::save)
+			   .map(userMapper::toDto);
+	//@formatter:on
   }
 
   /**
@@ -76,14 +79,16 @@ public class UserServiceImpl implements UserService {
   @Override
   public Mono<UserDto> update(UserDto userDto) {
     LOGGER.debug("Request update an existing user : {}", userDto);
+
     Assert.notNull(userDto, "User cannot be null");
     Assert.hasText(userDto.getId(), "Id of the user cannot be null/empty");
 
-    return findById(userDto.getId())
-        .flatMap(u -> Mono.just(userMapper.toEntity(userDto)))
-        .publishOn(Schedulers.parallel())
-        .doOnNext(userRepository::save)
-        .map(userMapper::toDto);
+    //@formatter:off
+    return findById(userDto.getId()).flatMap(u -> Mono.just(userMapper.toEntity(userDto)))
+									.publishOn(Schedulers.parallel())
+									.doOnNext(userRepository::save)
+									.map(userMapper::toDto);
+	//@formatter:on
   }
 
   /**
@@ -97,12 +102,14 @@ public class UserServiceImpl implements UserService {
   @Override
   public Mono<Void> deleteById(String userId) {
     LOGGER.debug("Request to delete user with id {}", userId);
+
     Assert.hasText(userId, "Id of the user cannot be null/empty");
 
-    return this.findById(userId)
-        .publishOn(Schedulers.parallel())
-        .doOnNext(userRepository::delete)
-        .then();
+    //@formatter:off
+    return this.findById(userId).publishOn(Schedulers.parallel())
+								.doOnNext(userRepository::delete)
+								.then();
+	//@formatter:on
   }
 
   /**
@@ -113,10 +120,11 @@ public class UserServiceImpl implements UserService {
    * @throws EntityNotFoundException if no entity was found
    */
   private Mono<User> findById(String id) {
-    return Mono.defer(() -> Mono.just(
-        userRepository.findById(UUID.fromString(id))
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Entity with id %s was not found", id)))))
-        .subscribeOn(Schedulers.elastic());
+    //@formatter:off
+    return Mono.defer(() -> Mono.just(userRepository.findById(UUID.fromString(id))
+								.orElseThrow(() -> new EntityNotFoundException(String.format("Entity with id %s was not found", id)))))
+			   .subscribeOn(Schedulers.elastic());
+	//@formatter:on
   }
 
 }
