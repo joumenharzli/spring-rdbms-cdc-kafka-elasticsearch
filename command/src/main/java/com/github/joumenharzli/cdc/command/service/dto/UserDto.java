@@ -16,6 +16,9 @@
 package com.github.joumenharzli.cdc.command.service.dto;
 
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import lombok.Data;
 
 /**
@@ -32,8 +35,8 @@ public class UserDto {
 
   private Integer age;
 
-  List<AddressDto> addresses;
+  private List<AddressDto> addresses = Lists.newArrayList();
 
-  List<JobDto> jobs;
+  private List<JobDto> jobs = Lists.newArrayList();
 
 }

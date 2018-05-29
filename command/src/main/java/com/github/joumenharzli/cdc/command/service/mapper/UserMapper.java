@@ -17,6 +17,7 @@ package com.github.joumenharzli.cdc.command.service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValueMappingStrategy;
 
 import com.github.joumenharzli.cdc.command.domain.User;
 import com.github.joumenharzli.cdc.command.service.dto.UserDto;
@@ -26,7 +27,8 @@ import com.github.joumenharzli.cdc.command.service.dto.UserDto;
  *
  * @author Joumen Harzli
  */
-@Mapper(componentModel = "spring", uses = {AddressMapper.class, JobMapper.class})
+@Mapper(componentModel = "spring", uses = {AddressMapper.class, JobMapper.class},
+    nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface UserMapper {
 
   @Mapping(target = "id", expression = "java( user.getId() == null ? null : java.util.UUID.fromString(user.getId()) )")

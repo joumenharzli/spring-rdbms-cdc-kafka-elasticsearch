@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValueMappingStrategy;
 
 import com.github.joumenharzli.cdc.command.domain.Job;
 import com.github.joumenharzli.cdc.command.service.dto.JobDto;
@@ -28,7 +29,7 @@ import com.github.joumenharzli.cdc.command.service.dto.JobDto;
  *
  * @author Joumen Harzli
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface JobMapper {
 
   @Mapping(target = "id",

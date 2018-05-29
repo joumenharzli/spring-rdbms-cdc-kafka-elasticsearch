@@ -33,7 +33,7 @@ import lombok.ToString;
  */
 @ApiModel("RestFieldsErrorsDto")
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class RestFieldsErrorsDto extends RestErrorDto implements Serializable {
 
   @Getter
