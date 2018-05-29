@@ -47,6 +47,9 @@ public class User implements Serializable {
   @Column(name = "NAME")
   private String name;
 
+  @Column(name = "AGE")
+  private Integer age;
+
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
   private List<Address> addresses = Lists.newArrayList();

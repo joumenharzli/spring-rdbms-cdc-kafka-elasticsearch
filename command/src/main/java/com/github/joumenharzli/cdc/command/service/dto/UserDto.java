@@ -30,6 +30,8 @@ public class UserDto {
 
   private String name;
 
+  private Integer age;
+
   List<AddressDto> addresses;
 
   List<JobDto> jobs;
