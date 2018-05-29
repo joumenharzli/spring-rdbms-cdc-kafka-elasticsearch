@@ -13,34 +13,30 @@
  *
  */
 
-package com.github.joumenharzli.cdc.query.service;
+package com.github.joumenharzli.cdc.query.service.mapper;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValueMappingStrategy;
 
 import com.github.joumenharzli.cdc.query.domain.User;
-import com.github.joumenharzli.cdc.query.service.dto.QueryParameter;
 import com.github.joumenharzli.cdc.query.service.dto.UserDto;
 
-import reactor.core.publisher.Mono;
 
 /**
- * Search Service for the index {@link User}
+ * UserMapper
  *
  * @author Joumen Harzli
  */
-public interface UserService {
+@Mapper(componentModel = "spring", uses = {AddressMapper.class, JobMapper.class},
+    nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
+public interface UserMapper {
 
-  /**
-   * Find users using the provided parameters
-   *
-   * @param parameters filters to use
-   * @param pageable   page number, size and sorting
-   * @return the found users in a page
-   * @throws IllegalArgumentException if any given argument is invalid
-   */
-  Mono<Page<UserDto>> findByCriteria(List<QueryParameter> parameters, Pageable pageable);
+  @Mapping(target = "id", expression = "java( user.getId() == null ? null : user.getId().toString() )")
+  UserDto toDto(User user);
+
+  List<UserDto> toDtos(List<User> user);
 
 }

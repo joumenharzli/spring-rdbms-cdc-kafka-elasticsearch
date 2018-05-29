@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.github.joumenharzli.cdc.query.domain.User;
 import com.github.joumenharzli.cdc.query.service.UserService;
+import com.github.joumenharzli.cdc.query.service.dto.UserDto;
 import com.github.joumenharzli.cdc.query.util.QueryUtils;
 import com.google.common.collect.Lists;
 
@@ -58,9 +59,9 @@ public class UserResource {
    */
   @GetMapping(value = {"/search/{parameters}", "/search"})
   @Timed
-  public Mono<ResponseEntity<Page<User>>> search(@PathVariable Optional<String> parameters,
-                                                 @RequestParam(name = "page") int page,
-                                                 @RequestParam(name = "size") int size) {
+  public Mono<ResponseEntity<Page<UserDto>>> search(@PathVariable Optional<String> parameters,
+                                                    @RequestParam(name = "page") int page,
+                                                    @RequestParam(name = "size") int size) {
 
     LOGGER.debug("REST request to search for users with parameters {} and page {} and size {}", parameters, page, size);
 
