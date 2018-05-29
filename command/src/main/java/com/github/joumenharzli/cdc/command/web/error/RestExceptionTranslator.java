@@ -30,8 +30,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.github.joumenharzli.cdc.command.exception.EntityNotFoundException;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -47,21 +45,6 @@ public class RestExceptionTranslator {
   private static final String ERROR_MSG = "Resolved error with code {}";
 
   private final MessageSource messageSource;
-
-  /**
-   * Handle entity not found exception thrown by EntityNotFoundException
-   * or any exception that inherits from it
-   *
-   * @return 404 status with message telling that the entity was not found
-   */
-  @ResponseStatus(value = HttpStatus.NOT_FOUND)
-  @ExceptionHandler(value = EntityNotFoundException.class)
-  @ResponseBody
-  public RestErrorDto handleShopNotFound(EntityNotFoundException exception) {
-    String errorCode = RestErrorConstants.ERR_NOT_FOUND_ERROR;
-    LOGGER.error(ERROR_MSG, errorCode, exception);
-    return new RestErrorDto(errorCode, getLocalizedMessageFromErrorCode(errorCode));
-  }
 
   /**
    * Handle validation errors

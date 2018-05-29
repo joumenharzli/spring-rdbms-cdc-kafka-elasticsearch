@@ -31,3 +31,9 @@ spring:
       naming:
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, info, prometheus

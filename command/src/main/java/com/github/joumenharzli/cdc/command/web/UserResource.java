@@ -23,11 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.codahale.metrics.annotation.Timed;
 import com.github.joumenharzli.cdc.command.domain.User;
 import com.github.joumenharzli.cdc.command.service.UserService;
 import com.github.joumenharzli.cdc.command.service.dto.UserDto;
 
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
