@@ -13,15 +13,19 @@
  *
  */
 
-package com.github.joumenharzli.cdc.denormalizer;
+package com.github.joumenharzli.cdc.denormalizer.exception;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+/**
+ * Exception thrown when no entity was found
+ *
+ * @author Joumen Harzli
+ */
+public class EntityNotFoundException extends RuntimeException {
 
-@SpringBootApplication
-public class DenormalizerApplication {
+  private final String message;
 
-  public static void main(String[] args) {
-    SpringApplication.run(DenormalizerApplication.class, args);
+  public EntityNotFoundException(String message) {
+    super(message);
+    this.message = message;
   }
 }

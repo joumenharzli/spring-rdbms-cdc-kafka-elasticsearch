@@ -13,15 +13,24 @@
  *
  */
 
-package com.github.joumenharzli.cdc.denormalizer;
+package com.github.joumenharzli.cdc.denormalizer.service.mapper;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueMappingStrategy;
 
-@SpringBootApplication
-public class DenormalizerApplication {
+import com.github.joumenharzli.cdc.denormalizer.domain.Address;
+import com.github.joumenharzli.cdc.denormalizer.service.dto.AddressDto;
 
-  public static void main(String[] args) {
-    SpringApplication.run(DenormalizerApplication.class, args);
-  }
+
+/**
+ * AddressMapper
+ *
+ * @author Joumen Harzli
+ */
+@Mapper(componentModel = "spring",
+    nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
+public interface AddressMapper {
+
+  Address toEntity(AddressDto addressDto);
+
 }

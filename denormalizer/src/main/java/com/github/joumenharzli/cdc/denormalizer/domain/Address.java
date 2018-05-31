@@ -13,15 +13,23 @@
  *
  */
 
-package com.github.joumenharzli.cdc.denormalizer;
+package com.github.joumenharzli.cdc.denormalizer.domain;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@SpringBootApplication
-public class DenormalizerApplication {
+/**
+ * AddressDto Type
+ *
+ * @author Joumen Harzli
+ */
+@Data
+@EqualsAndHashCode(of = {"id"})
+public class Address implements Serializable {
 
-  public static void main(String[] args) {
-    SpringApplication.run(DenormalizerApplication.class, args);
-  }
+  private String id;
+
+  private String name;
+
 }
