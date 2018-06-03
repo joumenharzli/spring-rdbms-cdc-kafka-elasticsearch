@@ -38,12 +38,12 @@ public class Address implements Serializable {
   @Id
   @GeneratedValue(generator = "uuid2")
   @GenericGenerator(name = "uuid2", strategy = "uuid2")
-  @Column(name = "ID", columnDefinition = "BINARY(16)")
-  private UUID id;
+  @Column(name = "ID", columnDefinition = "VARCHAR(36)")
+  private String id;
 
   @Column(name = "NAME")
   private String name;
 
-  @Column(name = "USER_ID", columnDefinition = "BINARY(16)", length = 16)
-  private UUID userId;
+  @Column(name = "USER_ID", columnDefinition = "VARCHAR(36)", length = 36)
+  private String userId;
 }

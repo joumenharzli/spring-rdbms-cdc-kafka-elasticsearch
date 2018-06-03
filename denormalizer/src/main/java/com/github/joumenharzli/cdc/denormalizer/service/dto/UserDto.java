@@ -15,14 +15,11 @@
 
 package com.github.joumenharzli.cdc.denormalizer.service.dto;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.joumenharzli.cdc.denormalizer.service.support.BytesToUUIDDeserializer;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
  * User Dto
@@ -33,14 +30,13 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = {"id"})
 public class UserDto implements Serializable {
 
-  @JsonProperty("id")
-  @JsonDeserialize(using = BytesToUUIDDeserializer.class)
+  @JsonProperty("ID")
   private String id;
 
-  @JsonProperty("name")
+  @JsonProperty("NAME")
   private String name;
 
-  @JsonProperty("age")
+  @JsonProperty("AGE")
   private Integer age;
 
 }

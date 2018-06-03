@@ -15,22 +15,25 @@
 
 package com.github.joumenharzli.cdc.denormalizer.listener;
 
-import java.util.Map;
-import java.util.function.Function;
-import javax.annotation.PostConstruct;
-
-import org.springframework.stereotype.Component;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent.DebeziumEventPayload;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent.DebeziumEventPayloadOperation;
 import com.github.joumenharzli.cdc.denormalizer.service.UserService;
 import com.github.joumenharzli.cdc.denormalizer.service.dto.UserDto;
 import com.google.common.collect.Maps;
-
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * User Listener
@@ -43,28 +46,34 @@ import reactor.core.publisher.Mono;
 public class UserListener {
 
   private final UserService userService;
-  private final Map<DebeziumEventPayloadOperation, Function<DebeziumEventPayload<UserDto>, Mono<Void>>> userActions = Maps.newConcurrentMap();
+  private final Map<DebeziumEventPayloadOperation, BiConsumer<UserDto, UserDto>> userActions = Maps.newConcurrentMap();
 
   @PostConstruct
   public void init() {
-    userActions.put(DebeziumEventPayloadOperation.CREATE, payload -> userService.save(payload.getAfter()));
-    userActions.put(DebeziumEventPayloadOperation.UPDATE, payload -> userService.save(payload.getAfter()));
-    userActions.put(DebeziumEventPayloadOperation.DELETE, payload -> userService.delete(payload.getBefore()));
+    userActions.put(DebeziumEventPayloadOperation.CREATE, (before, after) -> userService.save(after));
+    userActions.put(DebeziumEventPayloadOperation.UPDATE, (before, after) -> userService.save(after));
+    userActions.put(DebeziumEventPayloadOperation.DELETE, (before, after) -> userService.delete(before));
   }
 
-//  @KafkaListener(topics = "mysqlcdc.cdc.users")
-//  public void handleUserEvent(DebeziumEvent<UserDto> event) {
-//    DebeziumEventPayload<UserDto> payload = event.getPayload();
-//
-//    LOGGER.debug("Handling user event with payload : {}", payload);
-//
-//    process(payload).subscribe();
-//  }
+  @KafkaListener(topics = "mysqlcdc.cdc.USERS")
+  public void handleUserEvent(@Payload DebeziumEvent event, Acknowledgment acknowledgment) {
+    DebeziumEventPayload payload = event.getPayload();
+
+    LOGGER.debug("Handling user event with payload : {}", payload);
+
+    process(payload);
+    acknowledgment.acknowledge();
+  }
 
   @Timed
-  private Mono<Void> process(DebeziumEventPayload<UserDto> payload) {
+  private void process(DebeziumEventPayload payload) {
     DebeziumEventPayloadOperation operation = payload.getOperation();
-    return userActions.get(operation).apply(payload);
+
+    ObjectMapper mapper = new ObjectMapper();
+    UserDto before = mapper.convertValue(payload.getBefore(), UserDto.class);
+    UserDto after = mapper.convertValue(payload.getAfter(), UserDto.class);
+
+    userActions.get(operation).accept(before, after);
   }
 
 

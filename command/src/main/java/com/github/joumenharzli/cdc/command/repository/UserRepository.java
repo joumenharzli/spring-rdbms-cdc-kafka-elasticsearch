@@ -28,5 +28,5 @@ import com.github.joumenharzli.cdc.command.domain.User;
  * @author Joumen Harzli
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<User, String> {
 }

@@ -15,9 +15,6 @@
 
 package com.github.joumenharzli.cdc.denormalizer.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import com.github.joumenharzli.cdc.denormalizer.domain.User;
 import com.github.joumenharzli.cdc.denormalizer.exception.EntityNotFoundException;
 import com.github.joumenharzli.cdc.denormalizer.repository.UserRepository;
@@ -27,11 +24,13 @@ import com.github.joumenharzli.cdc.denormalizer.service.dto.UserDto;
 import com.github.joumenharzli.cdc.denormalizer.service.mapper.AddressMapper;
 import com.github.joumenharzli.cdc.denormalizer.service.mapper.JobMapper;
 import com.github.joumenharzli.cdc.denormalizer.service.mapper.UserMapper;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+import java.util.function.Supplier;
 
 /**
  * User Service
@@ -49,105 +48,101 @@ public class UserServiceImpl implements UserService {
   private final JobMapper jobMapper;
 
   @Override
-  public Mono<Void> save(UserDto userDto) {
+  public void save(UserDto userDto) {
     LOGGER.debug("Request to save user : {}", userDto);
 
     Assert.notNull(userDto, "User cannot be null");
 
-    //@formatter:off
-    return Mono.fromSupplier(() -> userMapper.toEntity(userDto))
-               .publishOn(Schedulers.parallel())
-               .doOnNext(userRepository::save)
-               .then();
-    //@formatter:on
+    userRepository.save(userMapper.toEntity(userDto));
   }
 
   @Override
-  public Mono<Void> delete(UserDto userDto) {
+  public void delete(UserDto userDto) {
     LOGGER.debug("Request to delete the user : {}", userDto);
 
     Assert.notNull(userDto, "User cannot be null");
     Assert.hasText(userDto.getId(), "User id cannot be null/empty");
 
-    //@formatter:off
-    return this.findById(userDto.getId()).publishOn(Schedulers.parallel())
-								.doOnNext(userRepository::delete)
-								.then();
-	//@formatter:on
-  }
-
-  private Mono<User> findById(String id) {
-    LOGGER.debug("Request to find the user with id : {}", id);
-
-    //@formatter:off
-    return Mono.defer(() -> Mono.just(userRepository.findById(id)
-								.orElseThrow(() -> new EntityNotFoundException(String.format("Entity with id %s was not found", id)))))
-			   .subscribeOn(Schedulers.elastic());
-	//@formatter:on
+    userRepository.delete(findById(userDto.getId()));
   }
 
   @Override
-  public Mono<Void> saveUserAddress(AddressDto addressDto) {
-    LOGGER.debug("Request to add address {} to the user", addressDto);
+  public void saveUserAddress(AddressDto addressDto) {
+    LOGGER.debug("Request to save address {} of the user", addressDto);
 
     Assert.notNull(addressDto, "Address cannot be null");
 
-    //@formatter:off
-    return Mono.justOrEmpty(addressDto.getUserId())
-               .flatMap(this::findById)
-               .doOnNext(user -> user.getAddresses().add(addressMapper.toEntity(addressDto)))
-               .publishOn(Schedulers.parallel())
-               .doOnNext(userRepository::save)
-               .then();
-    //@formatter:on
+    String userId = addressDto.getUserId();
+
+    if (StringUtils.isEmpty(userId)) {
+      LOGGER.debug("Request to save address {} of the user is ignored", addressDto);
+      return;
+    }
+
+    User user = findById(userId);
+    user.getAddresses().add(addressMapper.toEntity(addressDto));
+    userRepository.save(user);
   }
 
   @Override
-  public Mono<Void> deleteUserAddress(AddressDto addressDto) {
+  public void deleteUserAddress(AddressDto addressDto) {
     LOGGER.debug("Request to delete address {} of the user", addressDto);
 
     Assert.notNull(addressDto, "Address cannot be null");
 
-    //@formatter:off
-    return Mono.justOrEmpty(addressDto.getUserId())
-               .flatMap(this::findById)
-               .doOnNext(user -> user.getAddresses().remove(addressMapper.toEntity(addressDto)))
-               .publishOn(Schedulers.parallel())
-               .doOnNext(userRepository::save)
-               .then();
-    //@formatter:on
+    String userId = addressDto.getUserId();
+
+    if (StringUtils.isEmpty(userId)) {
+      LOGGER.debug("Request to remove address {} of the user is ignored", addressDto);
+      return;
+    }
+
+    User user = findById(userId);
+    user.getAddresses().remove(addressMapper.toEntity(addressDto));
+    userRepository.save(user);
   }
 
   @Override
-  public Mono<Void> saveUserJob(JobDto jobDto) {
-    LOGGER.debug("Request to add job {} to the user", jobDto);
+  public void saveUserJob(JobDto jobDto) {
+    LOGGER.debug("Request to save job {} of the user", jobDto);
 
     Assert.notNull(jobDto, "Job cannot be null");
 
-    //@formatter:off
-    return Mono.justOrEmpty(jobDto.getUserId())
-               .flatMap(this::findById)
-               .doOnNext(user -> user.getJobs().add(jobMapper.toEntity(jobDto)))
-               .publishOn(Schedulers.parallel())
-               .doOnNext(userRepository::save)
-               .then();
-    //@formatter:on
+    String userId = jobDto.getUserId();
+
+    if (StringUtils.isEmpty(userId)) {
+      LOGGER.debug("Request to save job {} of the user is ignored", jobDto);
+      return;
+    }
+
+    User user = findById(userId);
+    user.getJobs().add(jobMapper.toEntity(jobDto));
+    userRepository.save(user);
   }
 
   @Override
-  public Mono<Void> deleteUserJob(JobDto jobDto) {
+  public void deleteUserJob(JobDto jobDto) {
     LOGGER.debug("Request to delete job {} of the user", jobDto);
 
-    Assert.notNull(jobDto, "Address cannot be null");
+    Assert.notNull(jobDto, "Job cannot be null");
 
-    //@formatter:off
-    return Mono.justOrEmpty(jobDto.getUserId())
-               .flatMap(this::findById)
-               .doOnNext(user -> user.getJobs().remove(jobMapper.toEntity(jobDto)))
-               .publishOn(Schedulers.parallel())
-               .doOnNext(userRepository::save)
-               .then();
-    //@formatter:on
+    String userId = jobDto.getUserId();
+
+    if (StringUtils.isEmpty(userId)) {
+      LOGGER.debug("Request to remove job {} of the user is ignored", jobDto);
+      return;
+    }
+
+    User user = findById(userId);
+    user.getJobs().remove(jobMapper.toEntity(jobDto));
+    userRepository.save(user);
+  }
+
+  private User findById(String id) {
+    LOGGER.debug("Request to find the user with id : {}", id);
+
+    return userRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException(String.format("Entity with id %s was not found", id)));
   }
 
 

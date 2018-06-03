@@ -31,10 +31,8 @@ import com.github.joumenharzli.cdc.command.service.dto.UserDto;
     nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface UserMapper {
 
-  @Mapping(target = "id", expression = "java( user.getId() == null ? null : java.util.UUID.fromString(user.getId()) )")
   User toEntity(UserDto user);
 
-  @Mapping(target = "id", expression = "java( user.getId() == null ? null : user.getId().toString() )")
   UserDto toDto(User user);
 
 }

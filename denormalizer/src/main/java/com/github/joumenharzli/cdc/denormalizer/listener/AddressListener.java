@@ -15,24 +15,27 @@
 
 package com.github.joumenharzli.cdc.denormalizer.listener;
 
-import java.util.Map;
-import java.util.function.Function;
-import javax.annotation.PostConstruct;
-
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent.DebeziumEventPayload;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent.DebeziumEventPayloadOperation;
 import com.github.joumenharzli.cdc.denormalizer.service.UserService;
 import com.github.joumenharzli.cdc.denormalizer.service.dto.AddressDto;
 import com.google.common.collect.Maps;
-
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import javax.annotation.PostConstruct;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 /**
  * Address Listener
@@ -44,31 +47,36 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class AddressListener {
 
+
   private final UserService userService;
-  private final Map<DebeziumEventPayloadOperation, Function<DebeziumEventPayload<AddressDto>, Mono<Void>>> addressActions = Maps.newConcurrentMap();
+  private final Map<DebeziumEventPayloadOperation, BiConsumer<AddressDto, AddressDto>> userActions = Maps.newConcurrentMap();
 
   @PostConstruct
   public void init() {
-    addressActions.put(DebeziumEventPayloadOperation.CREATE, payload -> userService.saveUserAddress(payload.getAfter()));
-    addressActions.put(DebeziumEventPayloadOperation.UPDATE, payload -> userService.saveUserAddress(payload.getAfter()));
-    addressActions.put(DebeziumEventPayloadOperation.DELETE, payload -> userService.deleteUserAddress(payload.getBefore()));
+    userActions.put(DebeziumEventPayloadOperation.CREATE, (before, after) -> userService.saveUserAddress(after));
+    userActions.put(DebeziumEventPayloadOperation.UPDATE, (before, after) -> userService.saveUserAddress(after));
+    userActions.put(DebeziumEventPayloadOperation.DELETE, (before, after) -> userService.deleteUserAddress(before));
   }
 
-  @KafkaListener(topics = "mysqlcdc.cdc.addresses")
-  public void handleAddressEvent(DebeziumEvent<AddressDto> event) {
-
-    DebeziumEventPayload<AddressDto> payload = event.getPayload();
-    DebeziumEventPayloadOperation operation = payload.getOperation();
+  @KafkaListener(topics = "mysqlcdc.cdc.ADDRESSES")
+  public void handleUserEvent(@Payload DebeziumEvent event, Acknowledgment acknowledgment) {
+    DebeziumEventPayload payload = event.getPayload();
 
     LOGGER.debug("Handling address event with payload : {}", payload);
 
-    process(payload).subscribe();
+    process(payload);
+    acknowledgment.acknowledge();
   }
 
   @Timed
-  private Mono<Void> process(DebeziumEventPayload<AddressDto> payload) {
+  private void process(DebeziumEventPayload payload) {
     DebeziumEventPayloadOperation operation = payload.getOperation();
-    return addressActions.get(operation).apply(payload);
+
+    ObjectMapper mapper = new ObjectMapper();
+    AddressDto before = mapper.convertValue(payload.getBefore(), AddressDto.class);
+    AddressDto after = mapper.convertValue(payload.getAfter(), AddressDto.class);
+
+    userActions.get(operation).accept(before, after);
   }
 
 

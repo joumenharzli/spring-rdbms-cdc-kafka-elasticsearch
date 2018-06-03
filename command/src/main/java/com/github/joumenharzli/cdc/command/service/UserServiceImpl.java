@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
    */
   private Mono<User> findById(String id) {
     //@formatter:off
-    return Mono.defer(() -> Mono.just(userRepository.findById(UUID.fromString(id))
+    return Mono.defer(() -> Mono.just(userRepository.findById(id)
 								.orElseThrow(() -> new EntityNotFoundException(String.format("Entity with id %s was not found", id)))))
 			   .subscribeOn(Schedulers.elastic());
 	//@formatter:on

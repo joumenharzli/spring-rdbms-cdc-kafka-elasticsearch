@@ -15,24 +15,25 @@
 
 package com.github.joumenharzli.cdc.denormalizer.listener;
 
-import java.util.Map;
-import java.util.function.Function;
-import javax.annotation.PostConstruct;
-
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent.DebeziumEventPayload;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent.DebeziumEventPayloadOperation;
 import com.github.joumenharzli.cdc.denormalizer.service.UserService;
 import com.github.joumenharzli.cdc.denormalizer.service.dto.JobDto;
 import com.google.common.collect.Maps;
-
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * Job Listener
@@ -44,30 +45,35 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class JobListener {
 
+  private final ObjectMapper mapper;
   private final UserService userService;
-  private final Map<DebeziumEventPayloadOperation, Function<DebeziumEventPayload<JobDto>, Mono<Void>>> jobActions = Maps.newConcurrentMap();
+  private final Map<DebeziumEventPayloadOperation, BiConsumer<JobDto, JobDto>> userActions = Maps.newConcurrentMap();
 
   @PostConstruct
   public void init() {
-    jobActions.put(DebeziumEventPayloadOperation.CREATE, payload -> userService.saveUserJob(payload.getAfter()));
-    jobActions.put(DebeziumEventPayloadOperation.UPDATE, payload -> userService.saveUserJob(payload.getAfter()));
-    jobActions.put(DebeziumEventPayloadOperation.DELETE, payload -> userService.deleteUserJob(payload.getBefore()));
+    userActions.put(DebeziumEventPayloadOperation.CREATE, (before, after) -> userService.saveUserJob(after));
+    userActions.put(DebeziumEventPayloadOperation.UPDATE, (before, after) -> userService.saveUserJob(after));
+    userActions.put(DebeziumEventPayloadOperation.DELETE, (before, after) -> userService.deleteUserJob(before));
   }
 
-  @KafkaListener(topics = "mysqlcdc.cdc.jobs")
-  public void handleJobEvent(DebeziumEvent<JobDto> event) {
-
-    DebeziumEventPayload<JobDto> payload = event.getPayload();
+  @KafkaListener(topics = "mysqlcdc.cdc.JOBS")
+  public void handleUserEvent(@Payload DebeziumEvent event, Acknowledgment acknowledgment) {
+    DebeziumEventPayload payload = event.getPayload();
 
     LOGGER.debug("Handling job event with payload : {}", payload);
 
-    process(payload).subscribe();
+    process(payload);
+    acknowledgment.acknowledge();
   }
 
   @Timed
-  private Mono<Void> process(DebeziumEventPayload<JobDto> payload) {
+  private void process(DebeziumEventPayload payload) {
     DebeziumEventPayloadOperation operation = payload.getOperation();
-    return jobActions.get(operation).apply(payload);
+
+    JobDto before = mapper.convertValue(payload.getBefore(), JobDto.class);
+    JobDto after = mapper.convertValue(payload.getAfter(), JobDto.class);
+
+    userActions.get(operation).accept(before, after);
   }
 
 

@@ -32,16 +32,10 @@ import com.github.joumenharzli.cdc.command.service.dto.JobDto;
 @Mapper(componentModel = "spring", nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface JobMapper {
 
-  @Mapping(target = "id",
-      expression = "java( job.getId() == null ? null : java.util.UUID.fromString(job.getId()) )",
-      ignore = true)
   Job toEntity(JobDto job);
 
   List<Job> toEntities(List<JobDto> jobs);
 
-  @Mapping(target = "id",
-      expression = "java( job.getId() == null ? null : job.getId().toString() )",
-      ignore = true)
   JobDto toDto(Job job);
 
   List<JobDto> toDtos(List<Job> job);

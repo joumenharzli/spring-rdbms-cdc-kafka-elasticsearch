@@ -27,15 +27,15 @@ import reactor.core.publisher.Mono;
  * @author Joumen Harzli
  */
 public interface UserService {
-  Mono<Void> save(UserDto userDto);
+  void save(UserDto userDto);
 
-  Mono<Void> saveUserAddress(AddressDto addressDto);
+  void saveUserAddress(AddressDto addressDto);
 
-  Mono<Void> saveUserJob(JobDto jobDto);
+  void saveUserJob(JobDto jobDto);
 
-  Mono<Void> delete(UserDto userDto);
+  void delete(UserDto userDto);
 
-  Mono<Void> deleteUserJob(JobDto jobDto);
+  void deleteUserJob(JobDto jobDto);
 
-  Mono<Void> deleteUserAddress(AddressDto addressDto);
+  void deleteUserAddress(AddressDto addressDto);
 }

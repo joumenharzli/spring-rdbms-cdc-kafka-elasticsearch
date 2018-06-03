@@ -15,8 +15,8 @@
 
 package com.github.joumenharzli.cdc.denormalizer.config;
 
-import java.util.Map;
-
+import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent;
+import com.google.common.collect.ImmutableMap;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +28,10 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import java.util.UUID;
 
-import static org.springframework.boot.autoconfigure.kafka.KafkaProperties.Listener;
+import static org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode.MANUAL;
 
 @Configuration
 @EnableKafka
@@ -43,33 +44,33 @@ public class KafkaConfiguration {
   private String groupId;
 
   @Bean
-  ConcurrentKafkaListenerContainerFactory<Integer, String>
+  public ConcurrentKafkaListenerContainerFactory<String, DebeziumEvent>
   kafkaListenerContainerFactory() {
-    ConcurrentKafkaListenerContainerFactory<Integer, String> factory =
+    ConcurrentKafkaListenerContainerFactory<String, DebeziumEvent> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(consumerFactory());
+    factory.getContainerProperties().setAckMode(MANUAL);
     return factory;
   }
 
   @Bean
-  public ConsumerFactory<Integer, String> consumerFactory() {
-    return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+  public ConsumerFactory<String, DebeziumEvent> consumerFactory() {
+    return new DefaultKafkaConsumerFactory<>(consumerConfigs(),
+        new StringDeserializer(),
+        new JsonDeserializer<>(DebeziumEvent.class));
   }
 
   @Bean
   public Map<String, Object> consumerConfigs() {
     return ImmutableMap.<String, Object>builder()
         .put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-        .put(ConsumerConfig.GROUP_ID_CONFIG, groupId)
+        .put(ConsumerConfig.GROUP_ID_CONFIG, groupId + UUID.randomUUID().toString()+"123")
         .put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
         .put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class)
+        .put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+        .put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
+        .put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1")
         .build();
   }
-
-  @Bean
-  public Listener listener() {
-    return new Listener();
-  }
-
 
 }

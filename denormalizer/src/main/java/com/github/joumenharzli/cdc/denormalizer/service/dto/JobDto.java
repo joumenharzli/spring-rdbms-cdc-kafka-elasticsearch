@@ -15,15 +15,13 @@
 
 package com.github.joumenharzli.cdc.denormalizer.service.dto;
 
-import java.io.Serializable;
-import java.time.Instant;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.joumenharzli.cdc.denormalizer.service.support.BytesToUUIDDeserializer;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * Job Dto
@@ -34,23 +32,21 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = {"id"})
 public class JobDto implements Serializable {
 
-  @JsonProperty("id")
-  @JsonDeserialize(using = BytesToUUIDDeserializer.class)
+  @JsonProperty("ID")
   private String id;
 
-  @JsonProperty("name")
+  @JsonProperty("NAME")
   private String name;
 
-  @JsonProperty("description")
+  @JsonProperty("DESCRIPTION")
   private String description;
 
-  @JsonProperty("start_date")
-  private Instant startDate;
+  @JsonProperty("START_DATE")
+  private Date startDate;
 
-  @JsonProperty("end_date")
-  private Instant endDate;
+  @JsonProperty("END_DATE")
+  private Date endDate;
 
-  @JsonProperty("user_id")
-  @JsonDeserialize(using = BytesToUUIDDeserializer.class)
+  @JsonProperty("USER_ID")
   private String userId;
 }

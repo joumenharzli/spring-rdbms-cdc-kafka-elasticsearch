@@ -32,16 +32,10 @@ import com.github.joumenharzli.cdc.command.service.dto.AddressDto;
 @Mapper(componentModel = "spring", nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface AddressMapper {
 
-  @Mapping(target = "id",
-      expression = "java( address.getId() == null ? null : java.util.UUID.fromString(address.getId()) )",
-      ignore = true)
   Address toEntity(AddressDto address);
 
   List<Address> toEntities(List<Address> addresss);
 
-  @Mapping(target = "id",
-      expression = "java( address.getId() == null ? null : address.getId().toString() )",
-      ignore = true)
   AddressDto toDto(Address address);
 
   List<AddressDto> toDtos(List<Address> address);

@@ -17,8 +17,14 @@ package com.github.joumenharzli.cdc.denormalizer.domain;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
+import org.springframework.data.elasticsearch.annotations.Field;
+
+import static org.springframework.data.elasticsearch.annotations.FieldType.Date;
 
 /**
  * Job Type
@@ -35,8 +41,11 @@ public class Job implements Serializable {
 
   private String description;
 
-  private Instant startDate;
+  @Field(type = Date, format = DateFormat.date_time)
+  private Date startDate;
 
-  private Instant endDate;
+
+  @Field(type = Date, format = DateFormat.date_time)
+  private Date endDate;
 
 }
