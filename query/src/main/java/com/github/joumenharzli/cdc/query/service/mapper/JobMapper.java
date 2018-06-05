@@ -16,14 +16,12 @@
 package com.github.joumenharzli.cdc.query.service.mapper;
 
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValueMappingStrategy;
-
 import com.github.joumenharzli.cdc.query.domain.Job;
 import com.github.joumenharzli.cdc.query.service.dto.JobDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueMappingStrategy;
+
+import java.util.List;
 
 /**
  * JobMapper
@@ -33,9 +31,6 @@ import com.github.joumenharzli.cdc.query.service.dto.JobDto;
 @Mapper(componentModel = "spring", nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface JobMapper {
 
-  @Mapping(target = "id",
-      expression = "java( job.getId() == null ? null : job.getId().toString() )",
-      ignore = true)
   JobDto toDto(Job job);
 
   List<JobDto> toDtos(List<Job> job);

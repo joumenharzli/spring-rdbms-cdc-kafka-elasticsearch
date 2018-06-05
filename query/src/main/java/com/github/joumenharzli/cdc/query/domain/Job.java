@@ -15,10 +15,15 @@
 
 package com.github.joumenharzli.cdc.query.domain;
 
-import java.io.Serializable;
-import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
+import org.springframework.data.elasticsearch.annotations.Field;
+
+import java.io.Serializable;
+import java.time.Instant;
+
+import static org.springframework.data.elasticsearch.annotations.FieldType.Date;
 
 /**
  * Job Type
@@ -35,8 +40,11 @@ public class Job implements Serializable {
 
   private String description;
 
+  @Field(type = Date, format = DateFormat.date_time)
   private Instant startDate;
 
+
+  @Field(type = Date, format = DateFormat.date_time)
   private Instant endDate;
 
 }

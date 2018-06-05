@@ -19,11 +19,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.io.Serializable;
-import java.time.Instant;
-
-import static org.springframework.data.elasticsearch.annotations.FieldType.Date;
+import java.util.Date;
 
 /**
  * Job Type
@@ -40,11 +39,11 @@ public class Job implements Serializable {
 
   private String description;
 
-  @Field(type = Date, format = DateFormat.date_time)
-  private Instant startDate;
+  @Field(type = FieldType.Date, format = DateFormat.date_time)
+  private Date startDate;
 
 
-  @Field(type = Date, format = DateFormat.date_time)
-  private Instant endDate;
+  @Field(type = FieldType.Date, format = DateFormat.date_time)
+  private Date endDate;
 
 }

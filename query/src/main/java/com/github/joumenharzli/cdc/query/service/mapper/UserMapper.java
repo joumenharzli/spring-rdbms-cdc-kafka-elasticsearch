@@ -15,14 +15,12 @@
 
 package com.github.joumenharzli.cdc.query.service.mapper;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValueMappingStrategy;
-
 import com.github.joumenharzli.cdc.query.domain.User;
 import com.github.joumenharzli.cdc.query.service.dto.UserDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueMappingStrategy;
+
+import java.util.List;
 
 
 /**
@@ -34,7 +32,6 @@ import com.github.joumenharzli.cdc.query.service.dto.UserDto;
     nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface UserMapper {
 
-  @Mapping(target = "id", expression = "java( user.getId() == null ? null : user.getId().toString() )")
   UserDto toDto(User user);
 
   List<UserDto> toDtos(List<User> user);

@@ -15,18 +15,16 @@
 
 package com.github.joumenharzli.cdc.query.domain;
 
-import java.io.Serializable;
-import java.util.List;
-
+import com.google.common.collect.Sets;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import com.google.common.collect.Lists;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * User Index
@@ -46,9 +44,9 @@ public class User implements Serializable {
   private Integer age;
 
   @Field(type = FieldType.Nested)
-  private List<Address> addresses = Lists.newArrayList();
+  private Set<Address> addresses = Sets.newHashSet();
 
   @Field(type = FieldType.Nested)
-  private List<Job> jobs = Lists.newArrayList();
+  private Set<Job> jobs = Sets.newHashSet();
 
 }

@@ -15,14 +15,12 @@
 
 package com.github.joumenharzli.cdc.query.service.mapper;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValueMappingStrategy;
-
 import com.github.joumenharzli.cdc.query.domain.Address;
 import com.github.joumenharzli.cdc.query.service.dto.AddressDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueMappingStrategy;
+
+import java.util.List;
 
 
 /**
@@ -33,9 +31,6 @@ import com.github.joumenharzli.cdc.query.service.dto.AddressDto;
 @Mapper(componentModel = "spring", nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface AddressMapper {
 
-  @Mapping(target = "id",
-      expression = "java( address.getId() == null ? null : address.getId().toString() )",
-      ignore = true)
   AddressDto toDto(Address address);
 
   List<AddressDto> toDtos(List<Address> address);

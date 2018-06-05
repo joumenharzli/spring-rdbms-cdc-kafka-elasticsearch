@@ -15,12 +15,13 @@
 
 package com.github.joumenharzli.cdc.query.domain;
 
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
- * Address Type
+ * AddressDto Type
  *
  * @author Joumen Harzli
  */
