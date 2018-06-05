@@ -29,7 +29,6 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.Map;
-import java.util.UUID;
 
 import static org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode.MANUAL;
 
@@ -71,7 +70,7 @@ public class KafkaConfiguration {
   public Map<String, Object> consumerConfigs() {
     return ImmutableMap.<String, Object>builder()
         .put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-        .put(ConsumerConfig.GROUP_ID_CONFIG, groupId + UUID.randomUUID().toString()+"123")
+        .put(ConsumerConfig.GROUP_ID_CONFIG, groupId)
         .put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
         .put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class)
         .put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
