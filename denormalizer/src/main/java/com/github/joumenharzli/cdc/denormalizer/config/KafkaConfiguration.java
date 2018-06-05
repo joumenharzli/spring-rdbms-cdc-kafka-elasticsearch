@@ -33,6 +33,11 @@ import java.util.UUID;
 
 import static org.springframework.kafka.listener.AbstractMessageListenerContainer.AckMode.MANUAL;
 
+/**
+ * Kafka Consumer Configuration
+ *
+ * @author Joumen Harzli
+ */
 @Configuration
 @EnableKafka
 public class KafkaConfiguration {
@@ -46,18 +51,20 @@ public class KafkaConfiguration {
   @Bean
   public ConcurrentKafkaListenerContainerFactory<String, DebeziumEvent>
   kafkaListenerContainerFactory() {
-    ConcurrentKafkaListenerContainerFactory<String, DebeziumEvent> factory =
-        new ConcurrentKafkaListenerContainerFactory<>();
+    ConcurrentKafkaListenerContainerFactory<String, DebeziumEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+
     factory.setConsumerFactory(consumerFactory());
     factory.getContainerProperties().setAckMode(MANUAL);
+    factory.setBatchListener(true);
+
     return factory;
   }
 
   @Bean
   public ConsumerFactory<String, DebeziumEvent> consumerFactory() {
     return new DefaultKafkaConsumerFactory<>(consumerConfigs(),
-        new StringDeserializer(),
-        new JsonDeserializer<>(DebeziumEvent.class));
+                                             new StringDeserializer(),
+                                             new JsonDeserializer<>(DebeziumEvent.class));
   }
 
   @Bean
@@ -69,7 +76,7 @@ public class KafkaConfiguration {
         .put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class)
         .put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
         .put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
-        .put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1")
+        .put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10")
         .build();
   }
 

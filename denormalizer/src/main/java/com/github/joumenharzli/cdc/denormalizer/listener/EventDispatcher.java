@@ -16,17 +16,20 @@
 package com.github.joumenharzli.cdc.denormalizer.listener;
 
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
- * User Listener
+ * Event Dispatcher
  *
  * @author Joumen Harzli
  */
@@ -37,14 +40,27 @@ public class EventDispatcher {
 
   private final EventHandlerFactory handlerFactory;
 
-  @KafkaListener(topics = {"mysqlcdc.cdc.USERS", "mysqlcdc.cdc.JOBS", "mysqlcdc.cdc.ADDRESSES"})
-  public void handleUserEvent(@Payload DebeziumEvent event,
-                              @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+  @KafkaListener(topics = {
+      "mysqlcdc.cdc.USERS",
+      "mysqlcdc.cdc.JOBS",
+      "mysqlcdc.cdc.ADDRESSES"})
+  @Timed
+  public void handleEvents(List<ConsumerRecord<String, DebeziumEvent>> records,
                               Acknowledgment acknowledgment) {
 
-    LOGGER.debug("Request to handle an event in the topic : {}", topic);
+    LOGGER.debug("Request to process {} records", records.size());
 
-    handlerFactory.getHandler(topic).process(event);
+    List<ConsumerRecord<String, DebeziumEvent>> sortedRecords = records.stream()
+        .sorted(Comparator.comparing(r -> r.value().getPayload().getDate()))
+        .collect(Collectors.toList());
+
+    sortedRecords.forEach(record -> {
+
+      LOGGER.debug("Request to handle {} event in the topic {}", record.value().getPayload().getOperation(), record.topic());
+
+      handlerFactory.getHandler(record.topic()).process(record.value());
+
+    });
 
     acknowledgment.acknowledge();
   }

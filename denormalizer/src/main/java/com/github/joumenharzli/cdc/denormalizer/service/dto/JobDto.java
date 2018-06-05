@@ -21,7 +21,6 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Date;
 
 /**
  * Job Dto
@@ -42,10 +41,10 @@ public class JobDto implements Serializable {
   private String description;
 
   @JsonProperty("START_DATE")
-  private Date startDate;
+  private Instant startDate;
 
   @JsonProperty("END_DATE")
-  private Date endDate;
+  private Instant endDate;
 
   @JsonProperty("USER_ID")
   private String userId;
