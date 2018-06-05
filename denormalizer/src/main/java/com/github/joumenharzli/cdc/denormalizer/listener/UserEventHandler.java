@@ -16,7 +16,6 @@
 package com.github.joumenharzli.cdc.denormalizer.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent.DebeziumEventPayload;
 import com.github.joumenharzli.cdc.denormalizer.listener.support.DebeziumEvent.DebeziumEventPayloadOperation;
@@ -26,9 +25,6 @@ import com.google.common.collect.Maps;
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -43,7 +39,7 @@ import java.util.function.BiConsumer;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class UserListener {
+public class UserEventHandler implements EventHandler {
 
   private final UserService userService;
   private final Map<DebeziumEventPayloadOperation, BiConsumer<UserDto, UserDto>> userActions = Maps.newConcurrentMap();
@@ -55,18 +51,13 @@ public class UserListener {
     userActions.put(DebeziumEventPayloadOperation.DELETE, (before, after) -> userService.delete(before));
   }
 
-  @KafkaListener(topics = "mysqlcdc.cdc.USERS")
-  public void handleUserEvent(@Payload DebeziumEvent event, Acknowledgment acknowledgment) {
+  @Timed
+  @Override
+  public void process(DebeziumEvent event) {
     DebeziumEventPayload payload = event.getPayload();
 
-    LOGGER.debug("Handling user event with payload : {}", payload);
+    LOGGER.debug("Request to handle user event with payload : {}", payload);
 
-    process(payload);
-    acknowledgment.acknowledge();
-  }
-
-  @Timed
-  private void process(DebeziumEventPayload payload) {
     DebeziumEventPayloadOperation operation = payload.getOperation();
 
     ObjectMapper mapper = new ObjectMapper();
@@ -75,6 +66,4 @@ public class UserListener {
 
     userActions.get(operation).accept(before, after);
   }
-
-
 }
