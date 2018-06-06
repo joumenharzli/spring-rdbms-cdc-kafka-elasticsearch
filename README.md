@@ -13,56 +13,67 @@
 
 ### Requirements
 This example requires:
-* JDK 1.8.0
-* Docker
-* Docker-compose > 3.6
+* JDK 1.8
+* Docker >= 17
+* Docker-compose >= 3.6
 
 ### Steps
-Start by adding the hostname kafka with ip address 127.0.0.1 in the hosts file by running
+Start by building the Spring projects using
 ```bash
-echo "127.0.0.1     kafka" >> /etc/hosts
+sh build.sh
 ``` 
-<b>Note: </b>This step will be removed in the future when the microservices will be running in the same docker network as Kafka.
 
-Then run the containers using 
+Next, run the containers Command, MySQL, Kafka, Zookeeper, Kafka Connect using 
 ```bash
-docker-compose up -d
+docker-compose up --build -d mysql user-command kafka-connect
 ```
-you can exclude ElasticSearch if you want to keep some memory.
+
+<b>Note: </b> You can start all the project containers but this costs a lots of memory. You can simply use
+```bash
+docker-compose up --build -d
+```
 
 After the successful start of the containers, activate the Kafka connector by running the command
 ```bash
 sh activate_connector.sh
 ```
+If there are entities in the database Debezium will create a Snapshot.
 
-When the connector is successfully added, launch the Command Microservice
+When the connector is successfully added, you can add an entity by running the command
 ```bash
-cd command/
-mvnw spring-boot:run
-```
-
-Then we need to add an entity we can run the command
-```bash
-test_command.sh
+sh test_command.sh
 ```
 Add, update and remove endpoints was implemented in the Command Microservice but this will not be documented in this tutorial you can try them by yourself. After running the command it's possible to stop this Microservice and MySQL container.
+User Command will insert an entity into MySQL. Debezium will capture the changes and send events to kafka.
 
-If you stopped ElasticSearch please run it to continue.
-When the new entity is added, Start the denormalizer Microservice using the command
+When the new entity is added, start the Denormalizer Microservice and ElasticSearch.
+The Denormalizer will process the events received from Kafka and apply changes in ElasticSearch.
 ```bash
-cd denormalizer/
-mvnw spring-boot:run
-```
-This will process the events received from Kafka and add entities to ElasticSearch.
-
-If the events were successfully processed. Run the Query Microservice using the command
-```bash
-cd query/
-mvnw spring-boot:run
+docker-compose up --build -d user-denormalizer elasticsearch
 ```
 
-Then verify that everything is working using the command
+<b>Note: </b> It's possible also to stop MySQL and User Command if you don't plan to test some other operations
 ```bash
-test_query.sh
+docker-compose stop user-command mysql
 ```
- 
+
+Check if the events were successfully processed by reading the logs of the Denormalizer. You will find the message
+EventDispatcher.handleEvents took : x milliseconds
+
+To verify that everything is working start the Query Microservice and send a request to retrieve the entities.
+Use the commands
+```bash
+docker-compose up --build -d user-query
+sh test_query.sh
+```
+ <b>Note: </b> It's possible also to stop Denormalizer
+```bash
+docker-compose stop user-denormalizer
+``` 
+
+You can acheive a realtime indexing and denormalizing by running all the containers in the same time and launching the same test commands in the tutorial for example
+```bash
+sh test_command.sh
+sleep 3 # the process takes usually 2-3 seconds
+sh test_query.sh
+```

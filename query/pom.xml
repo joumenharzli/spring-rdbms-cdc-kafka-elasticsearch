@@ -23,7 +23,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>query</name>
+	<name>user-query</name>
 	<description>Query microservice for retrieving users</description>
 
 	<parent>
@@ -149,6 +149,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>${project.name}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

@@ -1,8 +1,71 @@
+#
+#  Copyright (C) 2018 Joumen Harzli
+#
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+#  in compliance with the License. You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software distributed under the License
+#  is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+#  or implied. See the License for the specific language governing permissions and limitations under
+#  the License.
+#
+
 version: '3.6'
 services:
+
+  user-command:
+    build: command
+    hostname: user-command
+    container_name: user-command
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    networks:
+      - cdcrx
+    environment:
+      JAVA_ARGS: "-Xmx512M -Xms256M"
+
+  user-denormalizer:
+    build: denormalizer
+    hostname: user-denormalizer
+    container_name: user-denormalizer
+    ports:
+      - "8084:8084"
+    depends_on:
+      - kafka
+      - elasticsearch
+    links:
+      - kafka
+      - elasticsearch
+    networks:
+      - cdcrx
+    environment:
+      JAVA_ARGS: "-Xmx512M -Xms256M"
+
+  user-query:
+    build: query
+    hostname: user-query
+    container_name: user-query
+    ports:
+      - "8082:8082"
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
+    networks:
+      - cdcrx
+    environment:
+      JAVA_ARGS: "-Xmx512M -Xms256M"
+
   mysql:
     build: mysql
     hostname: mysql
+    container_name: mysql
     ports:
       - "3306:3306"
     networks:
@@ -16,6 +79,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.6.9
     hostname: elasticsearch
+    container_name: elasticsearch
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -35,6 +99,7 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     hostname: zookeeper
+    container_name: zookeeper
     ports:
       - "32181:32181"
     networks:
@@ -46,6 +111,7 @@ services:
   kafka:
     image: confluentinc/cp-kafka:latest
     hostname: kafka
+    container_name: kafka
     depends_on:
       - zookeeper
     ports:
@@ -60,9 +126,10 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   
-  connect:
+  kafka-connect:
     build: connect
-    hostname: connect
+    hostname: kafka-connect
+    container_name: kafka-connect
     links:
       - zookeeper
       - kafka
@@ -90,7 +157,7 @@ services:
       CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
       CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/local/share/jars'
       CONNECT_REST_HOST_NAME: 0.0.0.0
-      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
       CONNECT_REST_PORT: 8083
 
 

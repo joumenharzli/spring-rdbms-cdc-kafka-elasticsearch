@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: user-query
+    name: user-denormalizer
 
   jackson:
     serialization.write-dates-as-timestamps: false
@@ -11,7 +11,7 @@ spring:
   data:
     elasticsearch:
       cluster-name: es-cluster
-      cluster-nodes: localhost:9300
+      cluster-nodes: elasticsearch:9300
 
 management:
   endpoints:
@@ -21,5 +21,5 @@ management:
 
 application:
   kafka:
-    bootstrapServers: localhost:29092
+    bootstrapServers: kafka:29092
     groupId: user-denormalizer

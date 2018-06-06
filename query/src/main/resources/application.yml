@@ -11,7 +11,7 @@ spring:
   data:
     elasticsearch:
       cluster-name: es-cluster
-      cluster-nodes: localhost:9300
+      cluster-nodes: elasticsearch:9300
 
 management:
   endpoints:
